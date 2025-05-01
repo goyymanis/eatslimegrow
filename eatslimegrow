@@ -1,0 +1,53 @@
+-- Eat Slimes to Grow Script with Orb Level
+local Players = game:GetService("Players")
+
+local function setupStats(player)
+    local leaderstats = Instance.new("Folder")
+    leaderstats.Name = "leaderstats"
+    leaderstats.Parent = player
+
+    local orbs = Instance.new("IntValue")
+    orbs.Name = "Orbs"
+    orbs.Value = 0
+    orbs.Parent = leaderstats
+
+    local level = Instance.new("IntValue")
+    level.Name = "Level"
+    level.Value = 1
+    level.Parent = leaderstats
+end
+
+local function onTouch(hit)
+    local character = hit.Parent
+    local player = Players:GetPlayerFromCharacter(character)
+    if player then
+        local humanoid = character:FindFirstChild("Humanoid")
+        local root = character:FindFirstChild("HumanoidRootPart")
+        local stats = player:FindFirstChild("leaderstats")
+
+        if humanoid and root and stats then
+            local orbs = stats:FindFirstChild("Orbs")
+            local level = stats:FindFirstChild("Level")
+
+            if orbs and level then
+                orbs.Value += 1
+                local newLevel = math.floor(orbs.Value / 10) + 1
+                if newLevel > level.Value then
+                    level.Value = newLevel
+                    root.Size += Vector3.new(1, 1, 1)
+                    humanoid.WalkSpeed += 1
+                end
+            end
+        end
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    setupStats(player)
+end)
+
+for _, slime in pairs(workspace:GetChildren()) do
+    if slime.Name == "Slime" and slime:IsA("BasePart") then
+        slime.Touched:Connect(onTouch)
+    end
+end
